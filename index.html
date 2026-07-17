@@ -1,4 +1,3 @@
-
 <!DOCTYPE html><html lang="vi"><head><meta charset="utf-8">
 <title>Three Phase Professional Demo</title>
 <style>
@@ -20,8 +19,8 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('service-wor
 </head><body>
 <div id="ui">
 <h2>Mô phỏng mạng điện 3 pha</h2>
-<label>φ <span id=pv>30</span>°</label><input id=phi type=range min=-90 max=90 value=30>
-<label>Tải</label><select id=load><option value=0>Thuần trở</option><option value=30 selected>Cảm</option><option value=-30>Dung</option></select>
+<label>Chọn nhanh loại tải</label>
+<select id=load><option value=0>Thuần trở (0°)</option><option value=30 selected>Tải Cảm (30°)</option><option value=-30>Tải Dung (-30°)</option></select>
 <label><input id=anim type=checkbox checked> Quay véc-tơ</label><br><label><input id="fixA" type="checkbox"> Cố định pha A tại 0° (12h)</label>
 <hr>
 <div id='calc'>
@@ -38,8 +37,15 @@ for(let a=0;a<360;a++){let t=a*Math.PI/180,r=(a%30?R-6:R-16);g.innerHTML+=`<line
 g.innerHTML+=`<circle cx=${cx} cy=${cy} r=${R} fill=none stroke=#666 stroke-width=2/>`;
 let rot=0;
 function arrow(a,l,c,m,n){let ang=90-a; let t=ang*Math.PI/180,x=cx+l*Math.cos(t),y=cy-l*Math.sin(t);v.innerHTML+=`<line x1=${cx} y1=${cy} x2=${x} y2=${y} stroke=${c} stroke-width=3 marker-end="url(#${m})"/><text x=${x+4} y=${y} fill=${c}>${n}</text>`}
-function draw(){v.innerHTML="";pv.textContent=phi.value;let base=(fixA.checked?0:rot);let U=[base,base-120,base+120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];for(let i=0;i<3;i++){let p=+document.getElementById("C"+i).value||0;let ai=U[i]-p;if(document.getElementById("N"+i).checked)ai+=180;arrow(U[i],240,"red","r",L[i]);arrow(ai,180,"blue","b",I[i]);}}
-phi.oninput=draw;load.onchange=()=>{phi.value=load.value;draw();}
+function draw(){v.innerHTML="";let base=(fixA.checked?0:rot);let U=[base,base-120,base+120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];for(let i=0;i<3;i++){let p=+document.getElementById("C"+i).value||0;let ai=U[i]-p;if(document.getElementById("N"+i).checked)ai+=180;arrow(U[i],240,"red","r",L[i]);arrow(ai,180,"blue","b",I[i]);}}
+
+load.onchange=()=>{
+  for(let i=0;i<3;i++) {
+    document.getElementById("C"+i).value = load.value;
+  }
+  calc();
+  draw();
+}
 function loop(){if(anim.checked && !fixA.checked) rot=(rot+1)%360;draw();requestAnimationFrame(loop)};loop();
 
 function calc(){
