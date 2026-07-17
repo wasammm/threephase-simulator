@@ -1,9 +1,20 @@
 {
-"name":"Three Phase Simulator",
-"short_name":"3Phase",
-"start_url":"./index.html",
-"display":"standalone",
-"background_color":"#20242b",
-"theme_color":"#1f4e79",
-"icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]
+  "name": "Mô phỏng mạng điện 3 pha",
+  "short_name": "Mạng 3 Pha",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#20242b",
+  "theme_color": "#1f4e79",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
