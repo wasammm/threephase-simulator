@@ -73,7 +73,10 @@ function draw(){
   let U=[base,base-120,base+120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];
   for(let i=0;i<3;i++){
     let p=+document.getElementById("C"+i).value||0;
-    let ai=U[i]-p;
+    
+    // Đã sửa dấu trừ thành dấu cộng để tải cảm (góc dương) làm dòng điện trễ pha
+    let ai=U[i]+p; 
+    
     if(document.getElementById("N"+i).checked) ai+=180;
     arrow(U[i],240,"red","r",L[i]);
     arrow(ai,180,"blue","b",I[i]);
@@ -88,7 +91,6 @@ load.onchange=()=>{
   draw();
 }
 
-// Hàm loop đã được cập nhật để quay ngược chiều kim đồng hồ
 function loop(){
   if(anim.checked && !fixA.checked) rot=(rot-1+360)%360;
   draw();
