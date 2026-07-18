@@ -70,7 +70,10 @@ function arrow(a,l,c,m,n){
 function draw(){
   v.innerHTML="";
   let base=(fixA.checked?0:rot);
-  let U=[base,base-120,base+120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];
+  
+  // Đã tráo đổi +120 và -120 để Ub và Ib nằm đúng vị trí theo sau Ua và Ia
+  let U=[base,base+120,base-120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];
+  
   for(let i=0;i<3;i++){
     let p=+document.getElementById("C"+i).value||0;
     
