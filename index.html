@@ -1,4 +1,7 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8">
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
 <title>Three Phase Professional Demo</title>
 <style>
 body{margin:0;font-family:Segoe UI;background:#20242b;color:#fff;display:flex;height:100vh}
@@ -16,28 +19,66 @@ if('serviceWorker' in navigator){
 window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));
 }
 </script>
-</head><body>
+</head>
+<body>
 <div id="ui">
 <h2>Mô phỏng mạng điện 3 pha</h2>
 <label>Chọn nhanh loại tải</label>
-<select id=load><option value=0>Thuần trở (0°)</option><option value=30 selected>Tải Cảm (30°)</option><option value=-30>Tải Dung (-30°)</option></select>
-<label><input id=anim type=checkbox checked> Quay véc-tơ</label><br><label><input id="fixA" type="checkbox"> Cố định pha A tại 0° (12h)</label>
+<select id="load">
+  <option value="0">Thuần trở (0°)</option>
+  <option value="30" selected>Tải Cảm (30°)</option>
+  <option value="-30">Tải Dung (-30°)</option>
+</select>
+<label><input id="anim" type="checkbox" checked> Quay véc-tơ</label><br>
+<label><input id="fixA" type="checkbox"> Cố định pha A tại 0° (12h)</label>
 <hr>
 <div id='calc'>
 <table>
 <tr><th>Pha</th><th>U(V)</th><th>I(A)</th><th>φ(°)</th><th>Ngược</th><th>P(kW)</th></tr>
-<tr><td>A</td><td><input id='U0' value='220'></td><td><input id='I0' value='10'></td><td><input id='C0' value='30'></td><td><input type='checkbox' id='N0'></td><td><span id='P0'></span></td></tr><tr><td>B</td><td><input id='U1' value='220'></td><td><input id='I1' value='10'></td><td><input id='C1' value='30'></td><td><input type='checkbox' id='N1'></td><td><span id='P1'></span></td></tr><tr><td>C</td><td><input id='U2' value='220'></td><td><input id='I2' value='10'></td><td><input id='C2' value='30'></td><td><input type='checkbox' id='N2'></td><td><span id='P2'></span></td></tr><tr style='font-weight:bold;background:#eef;color:#000'><td colspan='5' align='right'>TỔNG 3 PHA</td><td><span id='PTotal'>0.000</span></td></tr></table></div></div>
-<div id=view><svg id=svg width=800 height=800 viewBox="0 0 800 800">
-<defs><marker id=r markerWidth=8 markerHeight=8 refX=7 refY=4 orient=auto><path d="M0,0 8,4 0,8Z" fill=red/></marker>
-<marker id=b markerWidth=8 markerHeight=8 refX=7 refY=4 orient=auto><path d="M0,0 8,4 0,8Z" fill=blue/></marker></defs>
-<g id=g></g><g id=v></g></svg></div>
+<tr><td>A</td><td><input id='U0' value='220'></td><td><input id='I0' value='10'></td><td><input id='C0' value='30'></td><td><input type='checkbox' id='N0'></td><td><span id='P0'></span></td></tr>
+<tr><td>B</td><td><input id='U1' value='220'></td><td><input id='I1' value='10'></td><td><input id='C1' value='30'></td><td><input type='checkbox' id='N1'></td><td><span id='P1'></span></td></tr>
+<tr><td>C</td><td><input id='U2' value='220'></td><td><input id='I2' value='10'></td><td><input id='C2' value='30'></td><td><input type='checkbox' id='N2'></td><td><span id='P2'></span></td></tr>
+<tr style='font-weight:bold;background:#eef;color:#000'><td colspan='5' align='right'>TỔNG 3 PHA</td><td><span id='PTotal'>0.000</span></td></tr>
+</table>
+</div>
+</div>
+<div id="view">
+<svg id="svg" width="800" height="800" viewBox="0 0 800 800">
+<defs>
+<marker id="r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 8,4 0,8Z" fill="red"/></marker>
+<marker id="b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 8,4 0,8Z" fill="blue"/></marker>
+</defs>
+<g id="g"></g><g id="v"></g>
+</svg>
+</div>
 <script>
 const g=document.getElementById('g'),v=document.getElementById('v'),cx=400,cy=400,R=300;
-for(let a=0;a<360;a++){let t=a*Math.PI/180,r=(a%30?R-6:R-16);g.innerHTML+=`<line x1="${cx+r*Math.cos(t)}" y1="${cy-r*Math.sin(t)}" x2="${cx+R*Math.cos(t)}" y2="${cy-R*Math.sin(t)}" stroke="#bbb"/>`;if(a%30==0)g.innerHTML+=`<text x="${cx+(R+18)*Math.cos(t)}" y="${cy-(R+18)*Math.sin(t)}" font-size="10">${a}</text>`}
+for(let a=0;a<360;a++){
+  let t=a*Math.PI/180,r=(a%30?R-6:R-16);
+  g.innerHTML+=`<line x1="${cx+r*Math.cos(t)}" y1="${cy-r*Math.sin(t)}" x2="${cx+R*Math.cos(t)}" y2="${cy-R*Math.sin(t)}" stroke="#bbb"/>`;
+  if(a%30==0) g.innerHTML+=`<text x="${cx+(R+18)*Math.cos(t)}" y="${cy-(R+18)*Math.sin(t)}" font-size="10">${a}</text>`;
+}
 g.innerHTML+=`<circle cx=${cx} cy=${cy} r=${R} fill=none stroke=#666 stroke-width=2/>`;
+
 let rot=0;
-function arrow(a,l,c,m,n){let ang=90-a; let t=ang*Math.PI/180,x=cx+l*Math.cos(t),y=cy-l*Math.sin(t);v.innerHTML+=`<line x1=${cx} y1=${cy} x2=${x} y2=${y} stroke=${c} stroke-width=3 marker-end="url(#${m})"/><text x=${x+4} y=${y} fill=${c}>${n}</text>`}
-function draw(){v.innerHTML="";let base=(fixA.checked?0:rot);let U=[base,base-120,base+120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];for(let i=0;i<3;i++){let p=+document.getElementById("C"+i).value||0;let ai=U[i]-p;if(document.getElementById("N"+i).checked)ai+=180;arrow(U[i],240,"red","r",L[i]);arrow(ai,180,"blue","b",I[i]);}}
+function arrow(a,l,c,m,n){
+  let ang=90-a; 
+  let t=ang*Math.PI/180,x=cx+l*Math.cos(t),y=cy-l*Math.sin(t);
+  v.innerHTML+=`<line x1=${cx} y1=${cy} x2=${x} y2=${y} stroke=${c} stroke-width=3 marker-end="url(#${m})"/><text x=${x+4} y=${y} fill=${c}>${n}</text>`;
+}
+
+function draw(){
+  v.innerHTML="";
+  let base=(fixA.checked?0:rot);
+  let U=[base,base-120,base+120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];
+  for(let i=0;i<3;i++){
+    let p=+document.getElementById("C"+i).value||0;
+    let ai=U[i]-p;
+    if(document.getElementById("N"+i).checked) ai+=180;
+    arrow(U[i],240,"red","r",L[i]);
+    arrow(ai,180,"blue","b",I[i]);
+  }
+}
 
 load.onchange=()=>{
   for(let i=0;i<3;i++) {
@@ -46,19 +87,32 @@ load.onchange=()=>{
   calc();
   draw();
 }
-function loop(){if(anim.checked && !fixA.checked) rot=(rot+1)%360;draw();requestAnimationFrame(loop)};loop();
+
+// Hàm loop đã được cập nhật để quay ngược chiều kim đồng hồ
+function loop(){
+  if(anim.checked && !fixA.checked) rot=(rot-1+360)%360;
+  draw();
+  requestAnimationFrame(loop)
+};
+loop();
 
 function calc(){
-let pTotal=0;
-for(let i=0;i<3;i++){
- let U=+document.getElementById('U'+i).value||0;
- let I=+document.getElementById('I'+i).value||0;
- if(document.getElementById('N'+i).checked) I=-I;
- let pf=Math.cos((+document.getElementById("C"+i).value||0)*Math.PI/180);
- let P=((U*I*pf)/1000);document.getElementById('P'+i).textContent=P.toFixed(3);pTotal+=P;
+  let pTotal=0;
+  for(let i=0;i<3;i++){
+    let U=+document.getElementById('U'+i).value||0;
+    let I=+document.getElementById('I'+i).value||0;
+    if(document.getElementById('N'+i).checked) I=-I;
+    let pf=Math.cos((+document.getElementById("C"+i).value||0)*Math.PI/180);
+    let P=((U*I*pf)/1000);
+    document.getElementById('P'+i).textContent=P.toFixed(3);
+    pTotal+=P;
+  }
+  document.getElementById('PTotal').textContent=pTotal.toFixed(3)+' kW';
 }
-document.getElementById('PTotal').textContent=pTotal.toFixed(3)+' kW';}
+
 document.querySelectorAll("input").forEach(e=>e.oninput=()=>{calc();draw();});
 document.querySelectorAll("input[type=checkbox]").forEach(e=>e.onchange=()=>{calc();draw();});
 calc();
-</script></body></html>
+</script>
+</body>
+</html>
