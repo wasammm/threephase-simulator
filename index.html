@@ -2,17 +2,201 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
+<!-- Thêm thẻ meta viewport quan trọng để hiển thị đúng tỷ lệ trên mobile -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Three Phase Professional Demo</title>
 <style>
-body{margin:0;font-family:Segoe UI;background:#20242b;color:#fff;display:flex;height:100vh}
-#ui{width:300px;background:#2d333b;padding:16px;box-sizing:border-box}
-#view{flex:1;display:flex;justify-content:center;align-items:center}
-svg{background:#fff;border-radius:8px}
-input,select{width:100%}
-text{font-family:Segoe UI}
+/* CSS được nâng cấp cho Responsive & Giao diện hiện đại hơn */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #20242b;
+  color: #fff;
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  overflow: hidden; /* Desktop không scroll body */
+}
+
+#ui {
+  width: 340px;
+  background: #2d333b;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100%;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#ui h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.4rem;
+  color: #61afef;
+  text-align: center;
+}
+
+#view {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+}
+
+svg {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  /* viewBox tự động scale theo vùng chứa */
+}
+
+/* Kiểu dáng cho form input */
+label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #61afef;
+}
+
+select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #1e2227;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+select:focus { border-color: #61afef; }
+
+hr {
+  border: none;
+  border-top: 1px solid #444;
+  margin: 10px 0;
+  width: 100%;
+}
+
+/* Bảng tính toán */
+#calc {
+  background: #20242b;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #444;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  padding: 6px 2px;
+  text-align: center;
+}
+
+th {
+  color: #abb2bf;
+  font-weight: 600;
+  border-bottom: 1px solid #444;
+  padding-bottom: 8px;
+}
+
+td input[type="text"], td input[type="number"] {
+  width: 90%;
+  text-align: center;
+  padding: 6px 2px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #1e2227;
+  color: #fff;
+  box-sizing: border-box;
+}
+td input:focus { border-color: #61afef; outline: none; }
+
+.total-row {
+  font-weight: bold;
+  background: #28a745;
+  color: #fff;
+}
+.total-row td {
+  padding: 8px;
+}
+.total-row td:first-child {
+  border-radius: 0 0 0 8px;
+}
+.total-row td:last-child {
+  border-radius: 0 0 8px 0;
+}
+
+/* ---------- RESPONSIVE CHO MOBILE ---------- */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column; /* Xếp chồng UI và View */
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto; /* Cho phép cuộn trên điện thoại */
+  }
+
+  #ui {
+    width: 100%;
+    height: auto;
+    order: 2; /* Chuyển bảng điều khiển xuống dưới */
+    box-shadow: none;
+    border-top: 2px solid #444;
+    padding: 16px 12px;
+  }
+
+  #view {
+    width: 100%;
+    height: 50vh; /* Phần vẽ đồ thị chiếm 50% màn hình đầu tiên */
+    order: 1; /* Hiển thị đồ thị ở trên cùng */
+    padding: 12px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  /* Nới rộng các nút/input để dễ chạm (Touch targets) trên mobile */
+  label {
+    font-size: 16px;
+    padding: 4px 0;
+  }
+  input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+  }
+  select, td input[type="text"], td input[type="number"] {
+    font-size: 15px;
+    padding: 8px 2px;
+  }
+  table {
+    font-size: 14px;
+  }
+}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#1f4e79">
+<meta name="theme-color" content="#20242b">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script>
 if('serviceWorker' in navigator){
@@ -22,28 +206,52 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('service-wor
 </head>
 <body>
 <div id="ui">
-<h2>Mô phỏng mạng điện 3 pha</h2>
+<h2>Mô phỏng 3 Pha</h2>
 <label>Chọn nhanh loại tải</label>
 <select id="load">
   <option value="0">Thuần trở (0°)</option>
   <option value="30" selected>Tải Cảm (30°)</option>
   <option value="-30">Tải Dung (-30°)</option>
 </select>
-<label><input id="anim" type="checkbox" checked> Quay véc-tơ</label><br>
+<label><input id="anim" type="checkbox" checked> Quay véc-tơ tự động</label>
 <label><input id="fixA" type="checkbox"> Cố định pha A tại 0° (12h)</label>
-<hr>
+
 <div id='calc'>
 <table>
 <tr><th>Pha</th><th>U(V)</th><th>I(A)</th><th>φ(°)</th><th>Ngược</th><th>P(kW)</th></tr>
-<tr><td>A</td><td><input id='U0' value='220'></td><td><input id='I0' value='10'></td><td><input id='C0' value='30'></td><td><input type='checkbox' id='N0'></td><td><span id='P0'></span></td></tr>
-<tr><td>B</td><td><input id='U1' value='220'></td><td><input id='I1' value='10'></td><td><input id='C1' value='30'></td><td><input type='checkbox' id='N1'></td><td><span id='P1'></span></td></tr>
-<tr><td>C</td><td><input id='U2' value='220'></td><td><input id='I2' value='10'></td><td><input id='C2' value='30'></td><td><input type='checkbox' id='N2'></td><td><span id='P2'></span></td></tr>
-<tr style='font-weight:bold;background:#eef;color:#000'><td colspan='5' align='right'>TỔNG 3 PHA</td><td><span id='PTotal'>0.000</span></td></tr>
+<tr>
+  <td>A</td>
+  <td><input type="number" id='U0' value='220'></td>
+  <td><input type="number" id='I0' value='10'></td>
+  <td><input type="number" id='C0' value='30'></td>
+  <td><input type='checkbox' id='N0'></td>
+  <td><span id='P0'></span></td>
+</tr>
+<tr>
+  <td>B</td>
+  <td><input type="number" id='U1' value='220'></td>
+  <td><input type="number" id='I1' value='10'></td>
+  <td><input type="number" id='C1' value='30'></td>
+  <td><input type='checkbox' id='N1'></td>
+  <td><span id='P1'></span></td>
+</tr>
+<tr>
+  <td>C</td>
+  <td><input type="number" id='U2' value='220'></td>
+  <td><input type="number" id='I2' value='10'></td>
+  <td><input type="number" id='C2' value='30'></td>
+  <td><input type='checkbox' id='N2'></td>
+  <td><span id='P2'></span></td>
+</tr>
+<tr class="total-row">
+  <td colspan='5' align='right' style="padding-right: 10px;">TỔNG CÔNG SUẤT:</td>
+  <td><span id='PTotal'>0.000</span></td>
+</tr>
 </table>
 </div>
 </div>
 <div id="view">
-<svg id="svg" width="800" height="800" viewBox="0 0 800 800">
+<svg id="svg" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid meet">
 <defs>
 <marker id="r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 8,4 0,8Z" fill="red"/></marker>
 <marker id="b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 8,4 0,8Z" fill="blue"/></marker>
@@ -53,10 +261,15 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('service-wor
 </div>
 <script>
 const g=document.getElementById('g'),v=document.getElementById('v'),cx=400,cy=400,R=300;
+
+// Vẽ lưới toạ độ (vòng tròn và vạch độ)
 for(let a=0;a<360;a++){
   let t=a*Math.PI/180,r=(a%30?R-6:R-16);
   g.innerHTML+=`<line x1="${cx+r*Math.cos(t)}" y1="${cy-r*Math.sin(t)}" x2="${cx+R*Math.cos(t)}" y2="${cy-R*Math.sin(t)}" stroke="#bbb"/>`;
-  if(a%30==0) g.innerHTML+=`<text x="${cx+(R+18)*Math.cos(t)}" y="${cy-(R+18)*Math.sin(t)}" font-size="10">${a}</text>`;
+  if(a%30==0) {
+    // Điều chỉnh vị trí text chữ để không bị cắt xén
+    g.innerHTML+=`<text x="${cx+(R+24)*Math.cos(t)}" y="${cy-(R+24)*Math.sin(t)}" font-size="14" font-weight="bold" fill="#333" text-anchor="middle" dominant-baseline="middle">${a}</text>`;
+  }
 }
 g.innerHTML+=`<circle cx=${cx} cy=${cy} r=${R} fill=none stroke=#666 stroke-width=2/>`;
 
@@ -64,7 +277,14 @@ let rot=0;
 function arrow(a,l,c,m,n){
   let ang=90-a; 
   let t=ang*Math.PI/180,x=cx+l*Math.cos(t),y=cy-l*Math.sin(t);
-  v.innerHTML+=`<line x1=${cx} y1=${cy} x2=${x} y2=${y} stroke=${c} stroke-width=3 marker-end="url(#${m})"/><text x=${x+4} y=${y} fill=${c}>${n}</text>`;
+  
+  // Tinh chỉnh mũi tên và nhãn
+  let textAnchor = "start";
+  let dx = 6; let dy = 4;
+  if(x < cx) { textAnchor = "end"; dx = -6; }
+  
+  v.innerHTML+=`<line x1=${cx} y1=${cy} x2=${x} y2=${y} stroke=${c} stroke-width=4 marker-end="url(#${m})"/>
+  <text x=${x+dx} y=${y+dy} fill=${c} font-size="18" font-weight="bold" text-anchor="${textAnchor}">${n}</text>`;
 }
 
 function draw(){
@@ -86,16 +306,17 @@ function draw(){
   }
 }
 
-load.onchange=()=>{
+document.getElementById('load').onchange=()=>{
+  let loadSelect = document.getElementById('load');
   for(let i=0;i<3;i++) {
-    document.getElementById("C"+i).value = load.value;
+    document.getElementById("C"+i).value = loadSelect.value;
   }
   calc();
   draw();
 }
 
 function loop(){
-  if(anim.checked && !fixA.checked) rot=(rot-1+360)%360;
+  if(document.getElementById('anim').checked && !document.getElementById('fixA').checked) rot=(rot-1+360)%360;
   draw();
   requestAnimationFrame(loop)
 };
