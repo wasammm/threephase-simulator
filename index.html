@@ -56,10 +56,8 @@ svg {
   max-width: 100%;
   max-height: 100%;
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  /* viewBox tự động scale theo vùng chứa */
 }
 
-/* Kiểu dáng cho form input */
 label {
   display: flex;
   align-items: center;
@@ -94,7 +92,6 @@ hr {
   width: 100%;
 }
 
-/* Bảng tính toán */
 #calc {
   background: #20242b;
   border-radius: 8px;
@@ -148,51 +145,32 @@ td input:focus { border-color: #61afef; outline: none; }
   border-radius: 0 0 8px 0;
 }
 
-/* ---------- RESPONSIVE CHO MOBILE ---------- */
 @media (max-width: 768px) {
   body {
-    flex-direction: column; /* Xếp chồng UI và View */
+    flex-direction: column;
     height: auto;
     min-height: 100vh;
-    overflow-y: auto; /* Cho phép cuộn trên điện thoại */
+    overflow-y: auto;
   }
-
   #ui {
     width: 100%;
     height: auto;
-    order: 2; /* Chuyển bảng điều khiển xuống dưới */
+    order: 2;
     box-shadow: none;
     border-top: 2px solid #444;
     padding: 16px 12px;
   }
-
   #view {
     width: 100%;
-    height: 50vh; /* Phần vẽ đồ thị chiếm 50% màn hình đầu tiên */
-    order: 1; /* Hiển thị đồ thị ở trên cùng */
+    height: 50vh;
+    order: 1;
     padding: 12px;
   }
-
-  h2 {
-    font-size: 1.2rem;
-  }
-
-  /* Nới rộng các nút/input để dễ chạm (Touch targets) trên mobile */
-  label {
-    font-size: 16px;
-    padding: 4px 0;
-  }
-  input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
-  }
-  select, td input[type="text"], td input[type="number"] {
-    font-size: 15px;
-    padding: 8px 2px;
-  }
-  table {
-    font-size: 14px;
-  }
+  h2 { font-size: 1.2rem; }
+  label { font-size: 16px; padding: 4px 0; }
+  input[type="checkbox"] { width: 22px; height: 22px; }
+  select, td input[type="text"], td input[type="number"] { font-size: 15px; padding: 8px 2px; }
+  table { font-size: 14px; }
 }
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -262,12 +240,10 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('service-wor
 <script>
 const g=document.getElementById('g'),v=document.getElementById('v'),cx=400,cy=400,R=300;
 
-// Vẽ lưới toạ độ (vòng tròn và vạch độ)
 for(let a=0;a<360;a++){
   let t=a*Math.PI/180,r=(a%30?R-6:R-16);
   g.innerHTML+=`<line x1="${cx+r*Math.cos(t)}" y1="${cy-r*Math.sin(t)}" x2="${cx+R*Math.cos(t)}" y2="${cy-R*Math.sin(t)}" stroke="#bbb"/>`;
   if(a%30==0) {
-    // Điều chỉnh vị trí text chữ để không bị cắt xén
     g.innerHTML+=`<text x="${cx+(R+24)*Math.cos(t)}" y="${cy-(R+24)*Math.sin(t)}" font-size="14" font-weight="bold" fill="#333" text-anchor="middle" dominant-baseline="middle">${a}</text>`;
   }
 }
@@ -277,32 +253,74 @@ let rot=0;
 function arrow(a,l,c,m,n){
   let ang=90-a; 
   let t=ang*Math.PI/180,x=cx+l*Math.cos(t),y=cy-l*Math.sin(t);
-  
-  // Tinh chỉnh mũi tên và nhãn
   let textAnchor = "start";
   let dx = 6; let dy = 4;
   if(x < cx) { textAnchor = "end"; dx = -6; }
-  
   v.innerHTML+=`<line x1=${cx} y1=${cy} x2=${x} y2=${y} stroke=${c} stroke-width=4 marker-end="url(#${m})"/>
   <text x=${x+dx} y=${y+dy} fill=${c} font-size="18" font-weight="bold" text-anchor="${textAnchor}">${n}</text>`;
 }
 
 function draw(){
   v.innerHTML="";
-  let base=(fixA.checked?0:rot);
-  
-  // Đã tráo đổi +120 và -120 để Ub và Ib nằm đúng vị trí theo sau Ua và Ia
+  let base=(document.getElementById('fixA').checked?0:rot);
   let U=[base,base+120,base-120],L=["Ua","Ub","Uc"],I=["Ia","Ib","Ic"];
   
   for(let i=0;i<3;i++){
     let p=+document.getElementById("C"+i).value||0;
+    let isRev = document.getElementById("N"+i).checked;
     
-    // Đã sửa dấu trừ thành dấu cộng để tải cảm (góc dương) làm dòng điện trễ pha
     let ai=U[i]+p; 
+    if(isRev) ai+=180;
     
-    if(document.getElementById("N"+i).checked) ai+=180;
     arrow(U[i],240,"red","r",L[i]);
     arrow(ai,180,"blue","b",I[i]);
+
+    // === VẼ GÓC GIỮA U VÀ I (Fix lỗi hiển thị góc nhỏ) ===
+    let start = 90 - U[i];
+    let end = 90 - ai;
+    let r_arc = 50 + i*30; 
+    
+    let t1 = start * Math.PI / 180;
+    let t2 = end * Math.PI / 180;
+    let x1 = cx + r_arc * Math.cos(t1);
+    let y1 = cy - r_arc * Math.sin(t1);
+    let x2 = cx + r_arc * Math.cos(t2);
+    let y2 = cy - r_arc * Math.sin(t2);
+    
+    // Tính tổng góc quay thực tế bao gồm cả phần +180 độ khi ngược pha
+    let delta = p + (isRev ? 180 : 0);
+    
+    // Chuẩn hóa giới hạn hiển thị (phòng trường hợp nhập góc > 360)
+    while(delta > 360) delta -= 360;
+    while(delta < -360) delta += 360;
+    
+    // Sử dụng Large Arc Flag (cờ vẽ cung lớn) nếu góc quay vượt quá 180 độ
+    let largeArcFlag = Math.abs(delta) > 180 ? 1 : 0;
+    
+    // Sweep Flag quyết định hướng vẽ (cùng chiều kim đồng hồ hay ngược lại)
+    let sweepFlag = delta > 0 ? 1 : 0;
+    if (Math.abs(delta) === 180) sweepFlag = 1;
+    
+    let arcColor = "#8e44ad"; 
+    let path = "";
+    
+    // Vẽ cung tròn
+    if (Math.abs(delta) > 0.1) {
+        path = `<path d="M ${x1} ${y1} A ${r_arc} ${r_arc} 0 ${largeArcFlag} ${sweepFlag} ${x2} ${y2}" fill="none" stroke="${arcColor}" stroke-dasharray="4" stroke-width="2"/>`;
+    }
+    
+    // Tính vị trí tâm cung tròn để đặt chữ
+    let mid = U[i] + delta / 2;
+    let t_mid = (90 - mid) * Math.PI / 180;
+    let tr = r_arc + 16;
+    let tx = cx + tr * Math.cos(t_mid);
+    let ty = cy - tr * Math.sin(t_mid);
+    
+    let labelText = isRev ? (p + "° (+180°)") : (p + "°");
+    
+    path += `<text x="${tx}" y="${ty}" fill="${arcColor}" font-size="15" font-weight="bold" text-anchor="middle" dominant-baseline="middle">${labelText}</text>`;
+    
+    v.innerHTML += path;
   }
 }
 
